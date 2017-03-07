@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"><![endif]-->
+<!--[if IE 7]><html class="no-js lt-ie9 lt-ie8"><![endif]-->
+<!--[if IE 8]><html class="no-js lt-ie9"><![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Técnico Lisboa - Página Não Encontrada / Page Not Found</title>
+    <meta name="author" content="Técnico Lisboa">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Favicon to work in all desktop browsers: -->
+
+    <link rel="shortcut icon" href="//static.tecnico.ulisboa.pt/favicon.png" type="image/png">
+    <!-- Touch icon for iOS 2.0+: -->
+
+    <link rel="apple-touch-icon-precomposed" sizes="180x180" href="//static.tecnico.ulisboa.pt/apple-touch-icon-180x180-precomposed.png">
+    <!-- Touch icon for Android -->
+
+    <link rel="apple-touch-icon-precomposed" href="//static.tecnico.ulisboa.pt/apple-touch-icon-144x144-precomposed.png">
+    <!-- Google web fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,400italic,600italic,700italic' rel='stylesheet' type='text/css'>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="//static.tecnico.ulisboa.pt/projects/error-pages/css/main.css">
+
+    <!-- Modernizr -->
+    <script src="//static.tecnico.ulisboa.pt/projects/error-pages/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+
+    <!-- HTML5 elements and Media queries support IE8 and below -->
+    <!--[if lt IE 9]>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.js"></script>
+    <![endif]-->
+</head>
+
+<body data-error="404" data-error-count="3">
+    <!--[if lt IE 9]>
+	    <p class="outdatedbrowser">Está a usar uma versão <strong>desatualizada</strong> do seu browser. Por favor <a href="//http://outdatedbrowser.com/">atualize-o</a> para melhorar a sua experiência.</p>
+	<![endif]-->
+
+    <!-- Background for Tablet and Desktop Devices -->
+    <div id="bg"></div>
+    <!-- end #bg-->
+
+    <!-- Page Container -->
+    <div class="center-container container-sm">
+
+        <header>
+            <h1 class="title"><a href="http://tecnico.ulisboa.pt">Instituto Superior Técnico</a></h1>
+        </header>
+
+        <main>
+            <h2 class="pt">Página Não Encontrada</h2>
+            <p class="pt">A página pode não existir ou ter um endereço diferente, por favor verifique se o caminho da página está escrito de forma correcta. Caso tenha seguido uma ligação interna antiga ou incorreta deverá reportar a situação para o e-mail <a href="mailto:dsi@tecnico.ulisboa.pt">dsi@tecnico.ulisboa.pt</a>.</p>
+            
+            <h2 class="en hidden">Page Not Found</h2>
+            <p class="en hidden">The page may not exist or have a different address, please verify if the url of the page is written correctly. If you have followed an old or incorrect internal link you should report the situation to the e-mail <a href="mailto:dsi@tecnico.ulisboa.pt">dsi@tecnico.ulisboa.pt</a>.</p>
+        </main>
+
+        <span class="clearfix"></span>
+    </div>
+    <!-- end #container -->
+    <!-- Scripts -->
+    <script src="//static.tecnico.ulisboa.pt/projects/error-pages/js/main.js" type="text/javascript"></script>
+    <script src="//static.tecnico.ulisboa.pt/projects/error-pages/js/analytics.js" type="text/javascript"></script>
+	<!-- Scripts -->
+</body>
+
+</html>
