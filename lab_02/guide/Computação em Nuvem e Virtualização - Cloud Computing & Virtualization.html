@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- saved from url=(0080)http://grupos.tecnico.ulisboa.pt/~meic-cnv.daemon/labs/labs-pin/labs-pin-w2.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15">
+		<title>Computação em Nuvem e Virtualização - Cloud Computing &amp; Virtualization</title>
+		
+	<style>@media print {#ghostery-purple-box {display:none !important}}</style></head>
+	<body background="./Computação em Nuvem e Virtualização - Cloud Computing &amp; Virtualization_files/public05-06" bgcolor="#ffffff" id="textArea">
+		<table width="100%">
+			<tbody><tr>
+				<td valign="middle" align="right" width="176"></td>
+				<td align="center">
+					<h1>CNV - Computação em Nuvem e Virtualização <br> Cloud Computing &amp; Virtualization  <br> 2016/2017
+					</h1>
+					<a href="http://fenix.ist.utl.pt/cursos/meic-a">MEIC-A</a><br>
+					<a href="http://fenix.ist.utl.pt/cursos/meic-t">MEIC-T</a><br>
+					<a href="http://fenix.ist.utl.pt/cursos/merc">METI</a><br>
+				</td>
+				<td valign="middle" align="right" width="146">
+					<a href="http://www.dei.ist.utl.pt/" target="_blank"><img border="0" src="./Computação em Nuvem e Virtualização - Cloud Computing &amp; Virtualization_files/logodei.gif" width="144"></a>
+				</td>
+			</tr>
+		</tbody></table>
+		<blockquote>
+			<hr noshade="" size="4" color="#b1bbd6">
+			<h2 align="center">
+				Laboratory 2: Development of Sample Pin Tools </h2>
+			<hr>
+			<h3>Overview</h3>
+			<p> Pin is invoked with the following syntax: <br>
+			<br></p><center><b>pin [Pin Args] [-t <tool dll=""> [Tool Args]] -- <app exe=""> [App args]</app></tool></b></center>
+			<p></p>
+	<hr>
+<center>
+<img src="./Computação em Nuvem e Virtualização - Cloud Computing &amp; Virtualization_files/pin-overview.jpg" width="750">
+</center>
+			<hr>
+			<h2> <center>For more information on Pin, refer to prior lab web page <a href="http://grupos.ist.utl.pt/meic-cnv/labs/labs-pin/labs-pin.html"> <b>here.</b></a> 
+			</center></h2>
+			
+<hr noshade="" size="4" color="#b1bbd6">
+<h2 align="center">Fast Creation of New Pin Tool File</h2>
+			
+			<h3><u>Linux/GCC</u></h3>
+				<ol>
+					<li> Clone the MyPinTool directory inside <i> /tmp/cnv/pin/source/tools/ </i></li>
+					<li> e.g. tmp/cnv/pin/source/tools&gt; cp -R MyPinTool/ teste
+					</li><li> &gt; cd teste </li>
+					<li> &gt; make</li><br>
+					<li><b> edit or replace MyPinTool.cpp file inside <i>teste/</i> and re-make </b>.</li>
+				</ol>
+		<hr noshade="" size="4" color="#b1bbd6">
+			<h2 align="center">Tasks</h2>
+			<h2> <u>New Sample Pin Tools to Develop: </u></h2>
+			
+			
+			<h3>1. Core component of Basic Block Code Cache </h3>
+			<b> Design new tool with combined functionality: <i>Core component of Basic Block Code Cache.</i> </b><br>
+			e.g., count number of executions of basic blocks; keep information of most recently executed basic blocks (e.g., approximating a round-robbin code cache of N blocks) and check, on each execution, if there would be a hit (preserving the block by refreshing its last execution) or miss in the cache (consider capacity of N=128). Finally aggregate results of efficiency with counts, and hits and misses in the basic block cache.
+			<br>
+			
+			<br>
+			<i><b>Approach:</b></i>
+			<ul>
+			<li>Clone MyPinTool inside Tools folder to a new folder ex1 with <i> &gt; cp -R MyPinTool ex1 </i>.</li>
+			<li>Extend file MyPinTool.cpp addressing the following:</li> <br>
+			<li>Create structure <b>BblLastCall_t</b> to hold relevant information about each basic block: <b>address</b> (bbl_addr of type ADDRINT) and <b>iteration of last execution</b> (last_bbl_call of type UINT64).</li>
+			<br><li>Create a C++ container, e.g. a map to hold data of all basic blocks, e.g. <i>std::map<addrint, bbllastcall_t=""> cache;</addrint,></i> , including the map header file <i>#include &lt;map&gt;</i>in the top of the file.<br>
+			<br></li><li> Extend the global variables to hold global statistics about hits and misses in the cache, and define the cache size (later repeat tests with smaller and larger values to check different results): <br>
+			<i>UINT64 insCount = 0;        //number of dynamically executed instructions
+			<br>UINT64 bblCount = 0;        //number of dynamically executed basic blocks
+			<br>UINT64 threadCount = 0;     //total number of threads, including main thread
+			<br>
+			<br>UINT64 bbl_hits = 0;
+			<br>UINT64 bbl_misses = 0;
+			<br>UINT64 bbl_cache_size = 128;  
+			</i>
+			</li><br>
+			<li> In analysis routine <b>CountBbl</b>, receive an additional argument to track basic block address: <br>
+			<i>VOID CountBbl(UINT32 numInstInBbl, ADDRINT BblAddr)	{		</i>
+			<br>
+			</li><br>
+			<li> In analysis routine CountBbL, access the basic block data, receive an additional argument to track basic block address: <br>
+			<i>BblLastCall_t &amp;bbl = cache[BblAddr];</i>
+			<br>
+			</li><br>
+			<li> In same routine, check whether basic block address matches the argument passed<br>
+			a) if no match initialize address and count, and increment one miss found.<br>
+			b) if there is match, check how long ago the block was executed last, and register miss or hit accordingly, updating counts:<br>
+			<i>if (bbl.last_bbl_call + bbl_cache_size &lt; bblCount) {<br></i>
+      		</li><br>
+			<li>In function TRACE, pass the additional argument to CountBBl: <br>
+			<i>BBL_InsertCall(bbl, IPOINT_BEFORE, (AFUNPTR)CountBbl, IARG_UINT32, BBL_NumIns(bbl), IARG_ADDRINT, BBL_Address(bbl), IARG_END);</i>
+			<br>
+			</li><br>
+			<li>Extend FINI routine to output all the new statistics.
+			</li><br>
+			<li>Edit the first KNOB in the source code and replace the empty string with the name of the results file.
+			</li><br>
+			<li>Perform make and address syntax and semantic errors.
+			</li></ul>
+			<br>
+			
+			<hr>
+			
+						
+			<h3>2. Core component of Register Allocator for Basic Block Translation. </h3>
+			<b> Design new tool with combined functionality: <i>Core component of Register Allocator for Basic Block Translation. </i></b><br>
+			e.g., for each basic block, keep information (counts) of the registers used by the code in that block. This information allows to find out the registers more heavily used in each block, and coud be used to drive register allocation decisions, i.e., which target (i.e., native) register should we map each register used (in the original code) to.
+			<br>
+			<br>
+			<i><b>Approach:</b></i>
+			<ul>
+			<li>Clone MyPinTool inside Tools folder to a new folder ex2 with <i> &gt; cp -R MyPinTool ex2 </i>.</li>
+			<li>Copy SimpleExamples/regmix.cpp file into ex2/MyPinTool.cpp, as it will be our basis for this sample tool.</li> <br>
+			<li>Extend new file MyPinTool.cpp addressing the following:</li> <br>
+			<li>Extend class  <b>BBLSTATS</b> to hold additional information regarding basic block addresses and register usage inside the block, following the same approach for the global statistics:<br>
+			<i>ADDRINT _bbl_addr;<br>
+			struct GLOBALSTATS _localStats; </i><br><br>
+			
+			</li><li> Extend function <b>ComputeGlobalStats</b> to record and consider register usage count information, specific to each basic block:<br>
+			a) declare local variable inside block iterator to point to each block local statistics: <br>
+			 <i>struct GLOBALSTATS *blockStats = (GLOBALSTATS *)&amp;(*bi)-&gt;_localStats; </i><br>
+			b) record register usage within the for iteration aggregating all the statistics for the block: <br>
+			 <i>GlobalStats.reg_r[*stats] += (*bi)-&gt;_counter;</i><br>
+			 <i>blockStats-&gt;reg_r[*stats] += (*bi)-&gt;_counter;</i>
+			 </li><br><br>
+			 
+			<li> For each basic block (outer for iteration) print header information for basic block with its header: <br> to print address use <i>StringFromAddrint((*bi)-&gt;_bbl_addr)</i> </li><br><br>
+			 
+			<li> For each basic block (outer for iteration) print all the information regarding register usage in the block that was previously aggregated:<br>
+			 clone the code from Fini() function headed by:<br> <i>for ( UINT32 i = 0; i &lt; MAX_REG; i++) </i><br> and change it to get info from  <b> _localStats </b> fields instead of GlobalStats.<br></li><br>
+			<li>perform make and address syntax and semantic errors.<br>
+			</li></ul>
+			<br>
+			
+			<hr>
+			
+			<h3>3. Identify Basic Blocks that invoke system-calls. </h3>
+			<b> Design new tool with combined functionality: <i>Identify Basic Blocks that invoke system-calls (core component for identification of blocks where OS emulation is needed).</i></b><br>
+			e.g., detect and record information regarding the basic blocks that invoke system-calls. In a process VM, these blocks must be detected beforehand (as seen in lectures), and emulated without allowing the guest code access the host OS directly (that might not even be executing in the machine).
+			
+			<br><br><i><b>Global Approach:</b></i><br>
+			<ul>
+			<li>Based on the previous two exercises, add information for each block regarding how many times a system call instruction is executed in each basic block.
+			</li><br>
+			<li>To check whether an instruction is a system call invocation, use the following test: <br><i>if (INS_IsSyscall(ins)) </i> 
+			</li></ul><br>
+			<br>
+			
+			
+			
+			<hr noshade="" size="4" color="#b1bbd6">
+
+				<h2><b><u>RNL Installation Setup (Reference from Week 1)</u></b></h2>
+
+				<h4><u>Linux/GCC</u></h4>
+				<ul>
+						<li> 1. pin <b>executable</b> should be already in the command path </li>
+						<li> E.g. of first invocation to check pin:&gt;
+						<br>
+						<b> &gt; pin -version </b></li>
+						<br>
+					<!--	<li> Then start one shell and change current directory to <b>/usr/lib/rnl-m2-avexe-pintools</b> to look for tools, and </li>
+						<li> Start another shell and change current directory to <b>/usr/share/src/pintools/</b> to check their source code.</li>	 -->
+
+						<li> <b>2. To setup the local environment for the lab, execute the following: (you can copy &amp; paste) </b><br></li>
+						&gt; mkdir /tmp/cnv/  <br>
+						&gt; mkdir /tmp/cnv/pin <br>
+						&gt; cd /tmp/cnv/pin <br>
+						&gt; cp -R /opt/pin/* <b>.</b>    <i>(do not forget the final dot)</i>
+						<br>
+						
+						<br>
+						<li> <b>3. Build the first pin tools from source code: </b><br></li>
+						&gt; cd /tmp/cnv/pin/source/tools/ManualExamples/  <br>
+						&gt; make <br>
+						
+						<br>
+												
+						<li> <b>4. For convenience, keep one shell open in each of the following folders, to execute instrumentation tools and check their source code: </b><br></li>
+						&gt; /tmp/cnv/pin/source/tools/ManualExamples/  <br>
+						&gt; /tmp/cnv/pin/source/tools/ManualExamples/obj-intel64  <br>	
+						
+						<br>
+						
+						<br> <i>(and later) </i><br>
+						&gt; /tmp/cnv/pin/source/tools/SimpleExamples/  <br>
+						&gt; /tmp/cnv/pin/source/tools/SimpleExamples/obj-intel64  <br>	
+						
+
+
+
+					</ul>
+
+				<hr>
+				<h3> Main Directories of Pin Installation </h3>
+				<ul>
+					<li><b>ia32/</b> and <b>intel64/</b>: pin binaries - executable files (bin) and libraries (lib).</li>
+					<br>
+					<li><b>source/include/</b>: files to #include in pin tool code.</li>
+					<br>
+					<br><li><b>source/tools/SimpleExamples/</b>: examples of tools.</li>
+					<li><b>source/tools/ManualExamples/</b>: examples of tools.</li>
+					<li><b>source/tools/MyPinTool/</b>: example of tool to extend.</li>
+					<br>
+					<li>Pin tools <b>binary files</b> should be under <b>obj-intel64</b> subfolder in each examples folder</li>
+
+				</ul>
+
+			<hr noshade="" size="4" color="#b1bbd6">
+
+			<h2 align="center">Structure of a Pin Tool</h2>
+			<p> A Pin tool file is normally divided in the following sections:
+			</p>
+			<ul>
+			<li><b>Include declarations</b></li>
+
+			<li><b>Global variables</b>: used to aggregate results.</li>
+
+			<li><b>Command line switches, i.e., KNOBS</b>: used to pass arguments to pin tools (e.g., KnobOutputFile).</li>
+
+			<li><b>Usage Function</b>: prints tool usage syntax.</li>
+
+			<li><b>Analysis routines</b>: update global variables when executed in instrumented code.</li>
+
+			<li><b>Instrumentation callbacks</b>: configure program instrumentation by inserting calls to analysis routines.</li>
+			<br>
+			<li><b>Main function:</b></li>
+				<ul>
+				<li> Initialize Pin.</li>
+				<li> Check Knobs. </li>
+				<li> Add/Install Intrumentation Functions. </li>
+				<li> Start Instrumented program. </li>
+				</ul>
+			</ul>
+
+			<hr noshade="" size="4" color="#b1bbd6">
+
+
+
+
+			<hr noshade="" size="4" color="#b1bbd6">
+
+
+
+</blockquote>
+
+
+
+
+
+</body></html>
