@@ -1,8 +1,8 @@
-/*BEGIN_LEGAL 
-Intel Open Source License 
+/*BEGIN_LEGAL
+Intel Open Source License
 
 Copyright (c) 2002-2016 Intel Corporation. All rights reserved.
- 
+
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
@@ -15,7 +15,7 @@ other materials provided with the distribution.  Neither the name of
 the Intel Corporation nor the names of its contributors may be used to
 endorse or promote products derived from this software without
 specific prior written permission.
- 
+
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -34,6 +34,24 @@ END_LEGAL */
 
 #include <stdio.h>
 #include "pin.H"
+
+/*
+  If you get in the output two consecutive rows with the same data, except in
+  one you have a R and in the oter one you have a W, this means you've encountered
+  a "complex" instruction.
+
+  For example: ADD R[1234], AX
+
+  Output format:
+    PC: R|w addr_in_memory_being_accessed
+
+
+
+  Ex:
+    0x7fde3c448c75: R 0x7fde3c666e68
+    0x7fde3c448c75: W 0x7fde3c666e68
+
+*/
 
 
 FILE * trace;
@@ -56,13 +74,22 @@ VOID Instruction(INS ins, VOID *v)
     // Instruments memory accesses using a predicated call, i.e.
     // the instrumentation is called iff the instruction will actually be executed.
     //
-    // On the IA-32 and Intel(R) 64 architectures conditional moves and REP 
+    // On the IA-32 and Intel(R) 64 architectures conditional moves and REP
     // prefixed instructions appear as predicated instructions in Pin.
+
+    /*
+      How many operands does instruction "ins" have?
+      Ex:
+        ADD AX, BX has 2 operands
+    */
     UINT32 memOperands = INS_MemoryOperandCount(ins);
 
     // Iterate over each memory operand of the instruction.
     for (UINT32 memOp = 0; memOp < memOperands; memOp++)
     {
+        /*
+          if (is read operation)
+        */
         if (INS_MemoryOperandIsRead(ins, memOp))
         {
             INS_InsertPredicatedCall(
@@ -71,9 +98,16 @@ VOID Instruction(INS ins, VOID *v)
                 IARG_MEMORYOP_EA, memOp,
                 IARG_END);
         }
-        // Note that in some architectures a single memory operand can be 
+        // Note that in some architectures a single memory operand can be
         // both read and written (for instance incl (%eax) on IA-32)
         // In that case we instrument it once for read and once for write.
+
+        /*
+          Is this instruction a write?
+
+          mepOp - memory operand that I'm using.
+            Ex: ADD R[1234] -> here the memOp is 1234
+        */
         if (INS_MemoryOperandIsWritten(ins, memOp))
         {
             INS_InsertPredicatedCall(
@@ -94,10 +128,10 @@ VOID Fini(INT32 code, VOID *v)
 /* ===================================================================== */
 /* Print Help Message                                                    */
 /* ===================================================================== */
-   
+
 INT32 Usage()
 {
-    PIN_ERROR( "This Pintool prints a trace of memory addresses\n" 
+    PIN_ERROR( "This Pintool prints a trace of memory addresses\n"
               + KNOB_BASE::StringKnobSummary() + "\n");
     return -1;
 }
@@ -117,6 +151,6 @@ int main(int argc, char *argv[])
 
     // Never returns
     PIN_StartProgram();
-    
+
     return 0;
 }

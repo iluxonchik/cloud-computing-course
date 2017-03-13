@@ -1,8 +1,8 @@
-/*BEGIN_LEGAL 
-Intel Open Source License 
+/*BEGIN_LEGAL
+Intel Open Source License
 
 Copyright (c) 2002-2016 Intel Corporation. All rights reserved.
- 
+
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
@@ -15,7 +15,7 @@ other materials provided with the distribution.  Neither the name of
 the Intel Corporation nor the names of its contributors may be used to
 endorse or promote products derived from this software without
 specific prior written permission.
- 
+
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -41,6 +41,14 @@ END_LEGAL */
 #include "control_manager.H"
 
 using namespace CONTROLLER;
+
+/*
+   "predicate" --> condition (if)
+
+   Tool's output meaning:
+     count_predicated --> num of times this instruction was executed
+     count-unpredicated --> num of times this instrction was encountered
+*/
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -286,6 +294,10 @@ LOCALVAR CONTROL_MANAGER control;
 
 VOID PIN_FAST_ANALYSIS_CALL docount(COUNTER * counter)
 {
+  /*
+    incr smth that is not an explicit value (we're incrementing smth that we reveive
+    as an argument).
+  */
     (*counter) += enabled;
 }
 
@@ -293,6 +305,14 @@ VOID PIN_FAST_ANALYSIS_CALL docount(COUNTER * counter)
 
 VOID Trace(TRACE trace, VOID *v)
 {
+  /*
+    Give me chunks of code that you're going to execute and iterate through
+    the basic blocks go through all the individual instr. in each basic block
+    (that's what the two for loops do).
+
+    for each basic block:
+      allocate memory to store stats about each basic block
+  */
     if ( KnobNoSharedLibs.Value()
          && IMG_Type(SEC_Img(RTN_Sec(TRACE_Rtn(trace)))) == IMG_TYPE_SHAREDLIB)
         return;
@@ -335,6 +355,10 @@ VOID Trace(TRACE trace, VOID *v)
 
 
         // Insert instrumentation to count the number of times the bbl is executed
+        /*
+          We're passing the pointer to structure containing the statistics for
+          that bbl.
+        */
         BBLSTATS * bblstats = new BBLSTATS(stats);
         INS_InsertCall(head, IPOINT_BEFORE, AFUNPTR(docount), IARG_FAST_ANALYSIS_CALL, IARG_PTR, &(bblstats->_counter), IARG_END);
 
