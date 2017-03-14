@@ -94,22 +94,42 @@ class BBLSTATS
 
     const UINT16 * _stats;
     COUNTER _counter;
+
+    ADDRINT _bbl_addr; // block address usage inside the bbl
+    struct GLOBALSTATS _localStats; // register usage inside the bbl
 };
 
 list<const BBLSTATS*> statsList;
 
 /* ===================================================================== */
 
-VOID ComputeGlobalStats()
+VOID ComputeGlobalStats(std::ofstream* out)
 {
+    // NOTE: this function is called by Fini()
+
+    *out << "#### BEGIN ComputeGlobalStats ####" << endl;
+
     // We have the count for each bbl and its stats, compute the summary
     for (list<const BBLSTATS*>::iterator bi = statsList.begin(); bi != statsList.end(); bi++)
     {
+        struct GLOBALSTATS *blockStats = (GLOBALSTATS*)&(*bi)->_localStats;
         for (const UINT16 * stats = (*bi)->_stats; *stats; stats++)
         {
             GlobalStats.reg_r[*stats] += (*bi)->_counter;
+            blockStats->reg_r[*stats] += (*bi)->_counter;
+        }
+        *out << "Header Info: " << StringFromAddrint((*bi)->_bbl_addr) << endl;
+
+        for ( UINT32 i = 0; i < MAX_REG; i++)
+        {
+            if( blockStats->reg_w[i] == 0 && blockStats->reg_r[i] == 0 ) continue;
+
+            *out << decstr(i,3) << " " <<  ljstr(REG_StringShort(REG(i)),15) <<
+                decstr( blockStats->reg_r[i],12) <<
+                decstr( blockStats->reg_w[i],12) << endl;
         }
     }
+    *out << "#### END ComputeGlobalStats ####" << endl;
 }
 
 /* ===================================================================== */
@@ -221,6 +241,8 @@ VOID Trace(TRACE trace, VOID *v)
 
         // Insert instrumentation to count the number of times the bbl is executed
         BBLSTATS * bblstats = new BBLSTATS(stats);
+        // NOTE LAB: add bbl addr to the stats, so that it can be printed out later
+        bblstats->_bbl_addr = BBL_Address(bbl);
         INS_InsertCall(BBL_InsHead(bbl), IPOINT_BEFORE, AFUNPTR(docount), IARG_PTR, &(bblstats->_counter), IARG_END);
 
         // Remember the counter and stats so we can compute a summary at the end
@@ -233,7 +255,7 @@ VOID Trace(TRACE trace, VOID *v)
 static std::ofstream* out = 0;
 VOID Fini(int, VOID * v)
 {
-    ComputeGlobalStats();
+    ComputeGlobalStats(out);
 
 
     *out <<
